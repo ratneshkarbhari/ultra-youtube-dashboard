@@ -8,6 +8,7 @@ use App\Models\DataModel;
 use App\Models\Video;
 use App\Models\VideoModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Videos extends Controller
 {
@@ -105,6 +106,9 @@ class Videos extends Controller
 
     function import_data_exe(Request $request){
 
+        $month = $request->monthSelect;
+        $year = $request->yearSelect;
+
 
         $path = $request->file('videoData')->move('./assets/uploaded_data_files',date("d-m-y")."-".$request->monthSelect."-".$request->yearSelect.".".$request->file("videoData")->extension());
             
@@ -112,80 +116,97 @@ class Videos extends Controller
 
         $allVideoData = $spreadsheet->getActiveSheet()->toArray();
 
+        $channelSystemIdsInDb = DB::select("select system_id from channels");
 
-        foreach($allVideoData as $videoData){
+        $videoSystemIdsInDb = DB::select("select system_id from videos");
 
 
+        $dataChunks = array_chunk($allVideoData,250);
 
-            if($videoData[0]!="Video ID"){
+        foreach($dataChunks as $chunk){
 
-                $videoExists = VideoModel::where("yt_id",$videoData[0])->first();
+            $chunkChannels = $chunkVideos = $chunkData = $channelSystemIdsInserted = $videoSystemIdsInserted = [] ;
 
-                if ($videoExists) {
+            foreach($chunk as $row){
 
-                    if($videoData[8]!="views"){
+                $videoYtId = $row[0];
+                $channelYtId = $row[4];
+                $assetId = $row[3];
+                $channelName = $row[2];
+                $type = $row[5];
+                $lot = $row[6];
+                $movieAlbum = $row[7];
+                $views = $row[8];
+                $revenue = $row[9];
 
-                        $dataAddedId = $this->create_data([
+                $channelSystemId = uniqid();
+                $videoSystemId = uniqid();
 
-                            "video_id" => $videoExists["id"],
-                            "month" => $request->monthSelect,
-                            "year" => $request->yearSelect,
-                            "views" => $videoData[8],
-                            "revenue" => $videoData[9]
-    
-                        ]);
-    
+                $singleChannel = [
 
-                    }
-                    
-                    
-                } else {
-                    
-                    $channelData = ChannelModel::where("yt_id",$videoData[4])->first();
-                    
-                    if(!$channelData){
+                    "yt_id" => $channelYtId,
+                    "system_id" => $channelSystemId,
+                    "name" => $channelName
 
-                        $channelId = $this->create_channel([
+                ];
 
-                            "yt_id" => $videoData[4],
-                            "name" => $videoData[2]
 
-                        ]);
+                if(!in_array($channelSystemId,$channelSystemIdsInserted)&&!in_array($channelSystemId,$channelSystemIdsInDb)){
 
-                    }else{
-                        $channelId = $channelData["id"];
-                    }
+                    $chunkChannels[] = $singleChannel;
 
-                    $videoAddedId = $this->create_video([
-                        "yt_id" => $videoData[0],
-                        // "title" => $videoData[1],
-                        "asset_id" => $videoData[3],
-                        "channel_system_id" => $channelId,
-                        "type" => $videoData[5],
-                        "lot" => $videoData[6],
-                        "movie_album" => $videoData[7]
-                    ]);
-                    
-                    $dataAddedId = $this->create_data([
-
-                        "video_id" => $videoAddedId,
-                        "month" => $request->monthSelect,
-                        "year" => $request->yearSelect,
-                        "views" => $videoData[8],
-                        "revenue" => $videoData[9]
-
-                    ]);
+                    $channelSystemIdsInserted[] = $channelSystemId;
 
                 }
 
+                $singleVideo = [
+
+                    "yt_id" => $videoYtId,
+                    "asset_id" => $assetId,
+                    "channel_system_id" => $channelSystemId,
+                    "system_id" => $videoSystemId,
+                    "lot" => $lot,
+                    "type" => $type,
+                    "movie_album" => $movieAlbum
+
+                ];
+
+                if(!in_array($videoSystemId,$videoSystemIdsInserted)&&!in_array($videoSystemId,$videoSystemIdsInDb)){
+
+                    $chunkVideos[] = $singleVideo;
+                    $videoSystemIdsInserted[] = $videoSystemId;
+
+                }
+
+
+                $singleVideoData = [
+                    "video_system_id" => $videoSystemId,
+                    "month" => $month,
+                    "year" => $year,
+                    "views" => $views,
+                    "revenue" => $revenue
+                ];
+
+                if(!$dataExists = DataModel::where("video_system_id",$videoSystemId)->where("month",$month)->where("year",$year)){
+
+                    $chunkData[] = $singleVideoData;
+                    
+                }else{
+
+                    DataModel::find($dataExists["id"])->update($singleVideoData);
+
+
+                }
+
+
             }
 
+            ChannelModel::insert($chunkChannels);
+            VideoModel::insert($chunkVideos);
+
+
         }
-
-        $this->import_data("Video Data uploaded","");
-
-        exit;
-
+        
     }
     
 }
