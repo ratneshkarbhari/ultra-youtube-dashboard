@@ -109,7 +109,10 @@ class Videos extends Controller
         $month = $request->monthSelect;
         $year = $request->yearSelect;
 
+        $channelIds = DB::select('SELECT yt_id FROM channels');
+        $videoIds = DB::select('SELECT yt_id FROM videos');
 
+        
         $path = $request->file('videoData')->move('./assets/uploaded_data_files',date("d-m-y")."-".$request->monthSelect."-".$request->yearSelect.".".$request->file("videoData")->extension());
             
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
@@ -120,7 +123,7 @@ class Videos extends Controller
 
         $dataChunks = array_chunk($allVideoData,250);
 
-        $addedChannels = $addedVideos = [];
+        $addedChannels = $addedVideos = $addedSingleData = [];
 
 
         foreach($dataChunks as $chunk){
@@ -152,7 +155,7 @@ class Videos extends Controller
                 ];
 
 
-                if(!in_array($channelYtId,$addedChannels)){
+                if(!in_array($channelYtId,$addedChannels)&&!in_array($channelYtId,$channelIds)){
 
                     $chunkChannels[] = $singleChannel;
 
@@ -172,7 +175,7 @@ class Videos extends Controller
 
                 ];
 
-                if(!in_array($videoYtId,$addedVideos)){
+                if(!in_array($videoYtId,$addedVideos)&&!in_array($videoYtId,$videoIds)){
 
                     $chunkVideos[] = $singleVideo;
                     $addedVideos[] = $videoYtId;
@@ -188,15 +191,11 @@ class Videos extends Controller
                     "revenue" => $revenue
                 ];
 
-                if(!$dataExists = DataModel::where("video_system_id",$videoSystemId)->where("month",$month)->where("year",$year)->first()){
+                if(!in_array($videoYtId,$addedSingleData)){
 
                     $chunkData[] = $singleVideoData;
+                    $addedSingleData[] = $videoYtId;
                     
-                }else{
-
-                    DataModel::find($dataExists["id"])->update($singleVideoData);
-
-
                 }
 
 
@@ -210,10 +209,10 @@ class Videos extends Controller
         }
 
 
-        dd([
-            "channels" => count($addedChannels),
-            "videos" => count($addedVideos)
-        ]);
+        // dd([
+        //     "channels" => count($addedChannels),
+        //     "videos" => count($addedVideos)
+        // ]);
         
     }
     
