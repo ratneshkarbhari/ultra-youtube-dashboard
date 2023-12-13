@@ -116,16 +116,17 @@ class Videos extends Controller
 
         $allVideoData = $spreadsheet->getActiveSheet()->toArray();
 
-        $channelSystemIdsInDb = DB::select("select system_id from channels");
-
-        $videoSystemIdsInDb = DB::select("select system_id from videos");
-
+        unset($allVideoData[0]);
 
         $dataChunks = array_chunk($allVideoData,250);
 
+        $addedChannels = $addedVideos = [];
+
+
         foreach($dataChunks as $chunk){
 
-            $chunkChannels = $chunkVideos = $chunkData = $channelSystemIdsInserted = $videoSystemIdsInserted = [] ;
+            $chunkChannels = $chunkVideos = $chunkData =  [] ;
+
 
             foreach($chunk as $row){
 
@@ -151,11 +152,11 @@ class Videos extends Controller
                 ];
 
 
-                if(!in_array($channelSystemId,$channelSystemIdsInserted)&&!in_array($channelSystemId,$channelSystemIdsInDb)){
+                if(!in_array($channelYtId,$addedChannels)){
 
                     $chunkChannels[] = $singleChannel;
 
-                    $channelSystemIdsInserted[] = $channelSystemId;
+                    $addedChannels[] = $channelYtId;
 
                 }
 
@@ -171,10 +172,10 @@ class Videos extends Controller
 
                 ];
 
-                if(!in_array($videoSystemId,$videoSystemIdsInserted)&&!in_array($videoSystemId,$videoSystemIdsInDb)){
+                if(!in_array($videoYtId,$addedVideos)){
 
                     $chunkVideos[] = $singleVideo;
-                    $videoSystemIdsInserted[] = $videoSystemId;
+                    $addedVideos[] = $videoYtId;
 
                 }
 
@@ -187,7 +188,7 @@ class Videos extends Controller
                     "revenue" => $revenue
                 ];
 
-                if(!$dataExists = DataModel::where("video_system_id",$videoSystemId)->where("month",$month)->where("year",$year)){
+                if(!$dataExists = DataModel::where("video_system_id",$videoSystemId)->where("month",$month)->where("year",$year)->first()){
 
                     $chunkData[] = $singleVideoData;
                     
@@ -203,9 +204,16 @@ class Videos extends Controller
 
             ChannelModel::insert($chunkChannels);
             VideoModel::insert($chunkVideos);
+            DataModel::insert($chunkData);
 
 
         }
+
+
+        dd([
+            "channels" => count($addedChannels),
+            "videos" => count($addedVideos)
+        ]);
         
     }
     
