@@ -27,7 +27,7 @@ class Videos extends Controller
 
         $dataModel = new DataModel();
 
-        $videoData = $dataModel->where("video_yt_id",$id)->get();
+        $videoData = $dataModel->where("video_system_id",$id)->get();
 
         $this->page_loader("video_data",[
             "title" => "Video data",
@@ -121,7 +121,9 @@ class Videos extends Controller
 
         $chunks = array_chunk($allVideoData,200);
 
-        $insertedChannels = $insertedVideos = $insertedVideoData = [];
+        $insertedChannels = $insertedVideos = $insertedVideoData =   [];
+
+        $chunkVideosCounter = 0;
 
         foreach($chunks as $videoDataPoints){
 
@@ -139,12 +141,8 @@ class Videos extends Controller
                 $views = $videoData[8];
                 $revenue = $videoData[9];
 
-                $channelSystemId = uniqid();
-                $videoSystemId = uniqid();
-
                 $singleChannel = [
                     "yt_id" => $channelYtId,
-                    "system_id" => $channelSystemId,
                     "name" => $channelName
                 ];
 
@@ -160,8 +158,7 @@ class Videos extends Controller
 
                 $singleVideo = [
                     "yt_id" => $videoYtId,
-                    "system_id" => $videoSystemId,
-                    "channel_system_id" => $channelSystemId,
+                    "channel_yt_id" => $channelYtId,
                     "asset_id" => $assetId,
                     "type" => $type,
                     "lot" => $lot,
@@ -178,9 +175,10 @@ class Videos extends Controller
 
                 }
 
+                
+
                 $singleVideoData = [
                     "video_yt_id" => $videoYtId,
-                    "video_system_id" => $videoSystemId,
                     "month" => $month,
                     "year" => $year,
                     "views"=> $views,
@@ -197,13 +195,18 @@ class Videos extends Controller
 
                 }
 
+                
+
             }
+
+
 
             ChannelModel::insert($chunkChannels);
             VideoModel::insert($chunkVideos);
             DataModel::insert($chunkVideoData);
 
         }
+
 
     }
     

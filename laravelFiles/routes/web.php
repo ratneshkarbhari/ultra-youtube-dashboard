@@ -23,5 +23,5 @@ Route::get('all-channels',[Channels::class,'list_channels']);
 Route::get('all-videos', [Videos::class,'list_videos']);
 Route::get('import-data', [Videos::class,'import_data']);
 Route::get("video-data/{id}",[Videos::class,'video_data']);
-
+Route::get("channel-videos/{id}",[Videos::class,'channel_videos']);
 Route::post('import-video-data-exe',[Videos::class,'import_data_exe']);
