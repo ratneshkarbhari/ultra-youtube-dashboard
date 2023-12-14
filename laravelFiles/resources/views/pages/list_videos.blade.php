@@ -19,7 +19,7 @@
                 
                 @foreach($videos as $video)
                 <tr>
-                    <td><a href="{{url('video-data/'.$video->id)}}">{{$video->yt_id}}</a></td>					
+                    <td><a href="{{url('video-data/'.$video->yt_id)}}">{{$video->yt_id}}</a></td>					
                     <td>{{$video->asset_id}}</td>
                     <td>{{$video->channel_system_id}}</td>
                     <td>{{$video->type}}</td>
