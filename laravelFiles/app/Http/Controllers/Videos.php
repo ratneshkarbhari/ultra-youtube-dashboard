@@ -27,7 +27,7 @@ class Videos extends Controller
 
         $dataModel = new DataModel();
 
-        $videoData = $dataModel->where("video_system_id",$id)->get();
+        $videoData = $dataModel->where("video_yt_id",$id)->get();
 
         $this->page_loader("video_data",[
             "title" => "Video data",
@@ -42,6 +42,22 @@ class Videos extends Controller
             "title" => "Import Video Data",
             "success" => $success,
             "error" => $error,
+        ]);
+
+    }
+
+
+    function channel_videos(
+        Request $request
+    ){
+
+        $ytId = $request->id;
+
+        $channelVideos = VideoModel::where("channel_yt_id",$ytId)->orderBy("id","desc")->get();
+
+        $this->page_loader("channel_videos",[
+            "title" => "Channel Videos",
+            "videos" => $channelVideos
         ]);
 
     }

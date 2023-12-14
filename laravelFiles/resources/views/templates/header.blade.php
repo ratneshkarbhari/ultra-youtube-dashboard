@@ -278,10 +278,10 @@
                                 <a href="{{ url('all-channels') }}" class="">Manage Channels
                                 </a>
                             </li>
-                            <li class="">
+                            <!-- <li class="">
                                 <a href="{{ url('all-videos') }}" class="">All Videos
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="">
                                 <a href="{{ url('import-data') }}" class="">Import Videos
                                 </a>                            
