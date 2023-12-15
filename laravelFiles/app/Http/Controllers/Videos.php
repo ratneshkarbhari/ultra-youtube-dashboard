@@ -101,10 +101,12 @@ class Videos extends Controller
         $videoIdsResult = DB::select($queryToFetchCurrentVideosInDb);
 
 
+
+
         $videoDataResult = DB::select($queryToFetchCurrentVideoDataInDb);
 
 
-        $channelIdsIndb = $videoIdsInDb = $videoDataIdsIndb = [];
+        $channelIdsIndb = $videoIdsIndb = $videoDataIdsIndb = [];
 
         foreach($channelIdsResult as $channelIdData){
 
@@ -129,6 +131,10 @@ class Videos extends Controller
         }
 
 
+        //dd(["channels"=>$channelIdsIndb,"videos"=>$videoIdsIndb,"video_data"=>$videoDataIdsIndb]);
+
+        // exit;
+
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
 
         $allVideoData = $spreadsheet->getActiveSheet()->toArray();
@@ -139,7 +145,6 @@ class Videos extends Controller
 
         $insertedChannels = $insertedVideos = $insertedVideoData =   [];
 
-        $chunkVideosCounter = 0;
 
         foreach($chunks as $videoDataPoints){
 
@@ -182,7 +187,23 @@ class Videos extends Controller
                 ];
 
                 $existsInTempVideoInsertArray = in_array($videoYtId,$insertedVideos);
-                $existsInVideoTable = in_array($videoYtId,$videoIdsInDb);
+                $existsInVideoTable = in_array($videoYtId,$videoIdsIndb);
+
+                // echo "Video YT ID : ".$videoYtId."<br>";
+                // //dd(["in_db"=>$videoIdsIndb,"inserted"=>$insertedVideos]);
+                
+
+                // if(!$existsInTempVideoInsertArray&&!$existsInVideoTable){
+                
+                //     echo "insert hoga ";
+
+                // }else{
+
+                //     echo "insert nae hoga";
+
+                // }
+
+                // exit;
 
                 if(!$existsInTempVideoInsertArray&&!$existsInVideoTable){
 
@@ -190,6 +211,8 @@ class Videos extends Controller
                     $insertedVideos[] = $videoYtId;
 
                 }
+
+                
 
                 
 
