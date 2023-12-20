@@ -37,14 +37,19 @@
 		<!-- DataTable css start -->
     <link rel="stylesheet" href="{{ url('assets/css/jquery.dataTables.min.css'); }}" />
     <link rel="stylesheet" href="{{ url('assets/css/buttons.dataTables.min.css'); }}" />
+
+    
 	<!-- DataTable css End -->
 
+    <link rel="stylesheet" href="{{ url('assets/css/select2.min.css'); }}" />
 
     <!--only for admin css  -->
 
     <link href="{{ url('assets/css/dashboard.css'); }}" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
+    {{-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> --}}
+
+    <script src="{{url('assets')}}/js/loader.js"></script>
 </head>
 
 <body>
@@ -284,6 +289,10 @@
                             </li> -->
                             <li class="">
                                 <a href="{{ url('import-data') }}" class="">Import Videos
+                                </a>                            
+                            </li>
+                            <li class="">
+                                <a href="{{ url('analytics') }}" class="">Analytics
                                 </a>                            
                             </li>
                             

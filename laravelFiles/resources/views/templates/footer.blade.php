@@ -13,7 +13,8 @@
     <script src="{{url('assets')}}/js/bootstrap.bundle.min.js"></script>
     <!-- Template Javascript -->
     <script src="{{url('assets')}}/js/color-modes.js"></script>
-    <script src="{{url('assets')}}/js/dashboard.js"></script>
+    
+    <script src="{{url('assets')}}/js/select2.min.js"></script>
 	
 	<!-- DataTable js start -->
     <script src="{{url('assets')}}/js/jquery.dataTables.min.js"></script>
@@ -23,21 +24,14 @@
     <script src="{{url('assets')}}/js/vfs_fonts.js"></script>
     <script src="{{url('assets')}}/js/buttons.html5.min.js"></script> 
     <script src="{{url('assets')}}/js/buttons.print.min.js"></script> 
+
     
 
-<script> 
-$(document).ready(function() {
-    $('.DataTable').DataTable( {
-        dom: 'lBfrtip',
-        buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-        ]
-    } );
-} );
-</script>
+    <script src="{{url('assets')}}/js/dashboard.js"></script>
+ 
 	<!-- DataTable js End -->
 
-
+    
 
 </body>
 

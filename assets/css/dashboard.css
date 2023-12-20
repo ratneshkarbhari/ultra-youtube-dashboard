@@ -134,10 +134,8 @@ a:hover{
     right: 0px;
     position: absolute;
   }
-main {
-  height: 100vh;
-  height: -webkit-fill-available;
-  max-height: 100vh;
+main { 
+  height: -webkit-fill-available; 
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -194,7 +192,7 @@ main {
 }
 .sidebar {
     min-height: calc(100vh - 110px);
-    max-height: 90vh;
+    max-height: 100%;
 }
 
 
@@ -227,7 +225,15 @@ main {
 tr.bg-danger th {
     background: #ed1c24;
 }
+div#example_length {
+  width: 100%;
+  display: block;
+  margin-bottom: 10px;
+}
 
+.chart-line {
+  height: 500px;
+}
 /* responsive css start */
 
 @media (max-width: 768px) {

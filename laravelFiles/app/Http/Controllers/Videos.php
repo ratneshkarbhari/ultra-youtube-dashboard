@@ -12,60 +12,69 @@ use Illuminate\Support\Facades\DB;
 
 class Videos extends Controller
 {
-    
-    function list_videos(){
 
-        $this->page_loader("list_videos",[
+    function list_videos()
+    {
+
+        $this->page_loader("list_videos", [
             "title" => "Video Data",
             "videos" => VideoModel::all()
         ]);
-
     }
 
 
-    function video_data($id){
+    function video_data($id)
+    {
 
         $dataModel = new DataModel();
 
-        $videoData = $dataModel->where("video_yt_id",$id)->get();
+        $videoData = $dataModel->where("video_yt_id", $id)->get();
 
-        $this->page_loader("video_data",[
+        $this->page_loader("video_data", [
             "title" => "Video data",
             "video_stats" => $videoData
         ]);
-
     }
 
-    function import_data($success="",$error=""){
+    function video_data_edit()
+    {
 
-        $this->page_loader("import_data",[
+        $this->page_loader("video_data_edit", [
+            "title" => "Video Data Edit",
+        ]);
+    }
+
+
+    function import_data($success = "", $error = "")
+    {
+
+        $this->page_loader("import_data", [
             "title" => "Import Video Data",
             "success" => $success,
             "error" => $error,
         ]);
-
     }
 
 
     function channel_videos(
         Request $request
-    ){
+    ) {
 
         $ytId = $request->id;
 
-        $channelVideos = VideoModel::where("channel_yt_id",$ytId)->orderBy("id","desc")->get();
+        $channelVideos = VideoModel::where("channel_yt_id", $ytId)->orderBy("id", "desc")->get();
 
-        $this->page_loader("channel_videos",[
+        $this->page_loader("channel_videos", [
             "title" => "Channel Videos",
             "videos" => $channelVideos
         ]);
-
     }
 
-    
 
 
-    function import_data_exe(Request $request){
+
+    function import_data_exe(Request $request)
+    {
 
         /* 
             1. get path of uploaded file 
@@ -89,14 +98,14 @@ class Videos extends Controller
         $month = $request->monthSelect;
         $year = $request->yearSelect;
 
-        $path = $request->file('videoData')->move('./assets/uploaded_data_files',date("d-m-y")."-".$request->monthSelect."-".$request->yearSelect.".".$request->file("videoData")->extension());
+        $path = $request->file('videoData')->move('./assets/uploaded_data_files', date("d-m-y") . "-" . $request->monthSelect . "-" . $request->yearSelect . "." . $request->file("videoData")->extension());
 
         $queryToFetchCurrentChannelsInDb = 'SELECT yt_id FROM channels';
         $queryToFetchCurrentVideosInDb = 'SELECT yt_id FROM videos';
-        $queryToFetchCurrentVideoDataInDb = 'SELECT video_yt_id FROM data WHERE month = "'.$month.'" AND year = '.$year;
+        $queryToFetchCurrentVideoDataInDb = 'SELECT video_yt_id FROM data WHERE month = "' . $month . '" AND year = ' . $year;
 
 
-        
+
         $channelIdsResult = DB::select($queryToFetchCurrentChannelsInDb);
         $videoIdsResult = DB::select($queryToFetchCurrentVideosInDb);
 
@@ -108,26 +117,23 @@ class Videos extends Controller
 
         $channelIdsIndb = $videoIdsIndb = $videoDataIdsIndb = [];
 
-        foreach($channelIdsResult as $channelIdData){
+        foreach ($channelIdsResult as $channelIdData) {
 
             $channelIdsIndb[] = $channelIdData->yt_id;
-
         }
 
-        
-        foreach($videoIdsResult as $videoIdData){
+
+        foreach ($videoIdsResult as $videoIdData) {
 
 
             $videoIdsIndb[] = $videoIdData->yt_id;
-
         }
 
 
-        
-        foreach($videoDataResult as $videoDataResultData){
+
+        foreach ($videoDataResult as $videoDataResultData) {
 
             $videoDataIdsIndb[] = $videoDataResultData->video_yt_id;
-
         }
 
 
@@ -141,16 +147,16 @@ class Videos extends Controller
 
         unset($allVideoData[0]);
 
-        $chunks = array_chunk($allVideoData,200);
+        $chunks = array_chunk($allVideoData, 200);
 
         $insertedChannels = $insertedVideos = $insertedVideoData =   [];
 
 
-        foreach($chunks as $videoDataPoints){
+        foreach ($chunks as $videoDataPoints) {
 
             $chunkChannels = $chunkVideos = $chunkVideoData = [];
 
-            foreach($videoDataPoints as $videoData){
+            foreach ($videoDataPoints as $videoData) {
 
                 $videoYtId = $videoData[0];
                 $channelYtId = $videoData[4];
@@ -167,14 +173,13 @@ class Videos extends Controller
                     "name" => $channelName
                 ];
 
-                $existsInTempChannelInsertArray = in_array($channelYtId,$insertedChannels);
-                $existsInChannelTable = in_array($channelYtId,$channelIdsIndb);
-                
-                if(!$existsInTempChannelInsertArray&&!$existsInChannelTable){
+                $existsInTempChannelInsertArray = in_array($channelYtId, $insertedChannels);
+                $existsInChannelTable = in_array($channelYtId, $channelIdsIndb);
+
+                if (!$existsInTempChannelInsertArray && !$existsInChannelTable) {
 
                     $chunkChannels[] = $singleChannel;
                     $insertedChannels[] = $channelYtId;
-
                 }
 
                 $singleVideo = [
@@ -183,18 +188,18 @@ class Videos extends Controller
                     "asset_id" => $assetId,
                     "type" => $type,
                     "lot" => $lot,
-                    "movie_album"=> $movieAlbum
+                    "movie_album" => $movieAlbum
                 ];
 
-                $existsInTempVideoInsertArray = in_array($videoYtId,$insertedVideos);
-                $existsInVideoTable = in_array($videoYtId,$videoIdsIndb);
+                $existsInTempVideoInsertArray = in_array($videoYtId, $insertedVideos);
+                $existsInVideoTable = in_array($videoYtId, $videoIdsIndb);
 
                 // echo "Video YT ID : ".$videoYtId."<br>";
                 // //dd(["in_db"=>$videoIdsIndb,"inserted"=>$insertedVideos]);
-                
+
 
                 // if(!$existsInTempVideoInsertArray&&!$existsInVideoTable){
-                
+
                 //     echo "insert hoga ";
 
                 // }else{
@@ -205,37 +210,32 @@ class Videos extends Controller
 
                 // exit;
 
-                if(!$existsInTempVideoInsertArray&&!$existsInVideoTable){
+                if (!$existsInTempVideoInsertArray && !$existsInVideoTable) {
 
                     $chunkVideos[] = $singleVideo;
                     $insertedVideos[] = $videoYtId;
-
                 }
 
-                
 
-                
+
+
 
                 $singleVideoData = [
                     "video_yt_id" => $videoYtId,
                     "month" => $month,
                     "year" => $year,
-                    "views"=> $views,
+                    "views" => $views,
                     "revenue" => $revenue
                 ];
 
-                $existsInTempVideoDataInsertArray = in_array($videoYtId,$insertedVideoData);
-                $existsInVideoDataTable = in_array($videoYtId,$videoDataIdsIndb);
+                $existsInTempVideoDataInsertArray = in_array($videoYtId, $insertedVideoData);
+                $existsInVideoDataTable = in_array($videoYtId, $videoDataIdsIndb);
 
-                if(!$existsInTempVideoDataInsertArray&&!$existsInVideoDataTable){
+                if (!$existsInTempVideoDataInsertArray && !$existsInVideoDataTable) {
 
                     $chunkVideoData[] = $singleVideoData;
                     $insertedVideoData[] = $videoYtId;
-
                 }
-
-                
-
             }
 
 
@@ -243,10 +243,6 @@ class Videos extends Controller
             ChannelModel::insert($chunkChannels);
             VideoModel::insert($chunkVideos);
             DataModel::insert($chunkVideoData);
-
         }
-
-
     }
-    
 }
