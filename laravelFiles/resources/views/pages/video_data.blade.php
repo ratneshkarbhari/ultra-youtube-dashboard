@@ -11,6 +11,7 @@
                     <th>Year</th>
                     <th>Views</th>
                     <th>Revenue</th>
+                    <th>RPM</th>
                 </tr>
             </thead>
             <tbody>
@@ -21,7 +22,8 @@
                     <td>{{$video_stat->month}}</td>					
                     <td>{{$video_stat->year}}</td>					
                     <td>{{$video_stat->views}}</td>					
-                    <td>{{$video_stat->revenue}}</td>					
+                    <td>{{$video_stat->revenue}}</td>				
+                    <td>{{$video_stat->rpm}}</td>						
                 </tr>
                 @endforeach
             </tbody>

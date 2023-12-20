@@ -61,10 +61,7 @@ class Videos extends Controller
         ]);
 
     }
-
     
-
-
     function import_data_exe(Request $request){
 
         /* 
@@ -131,9 +128,6 @@ class Videos extends Controller
         }
 
 
-        //dd(["channels"=>$channelIdsIndb,"videos"=>$videoIdsIndb,"video_data"=>$videoDataIdsIndb]);
-
-        // exit;
 
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
 
@@ -153,14 +147,16 @@ class Videos extends Controller
             foreach($videoDataPoints as $videoData){
 
                 $videoYtId = $videoData[0];
-                $channelYtId = $videoData[4];
+                $channelYtId = $videoData[3];
                 $channelName = $videoData[2];
-                $type = $videoData[5];
-                $assetId = $videoData[3];
-                $lot = $videoData[6];
-                $movieAlbum = $videoData[7];
-                $views = $videoData[8];
-                $revenue = $videoData[9];
+                $type = $videoData[6];
+                $assetId = $videoData[4];
+                $customId = $videoData[5];
+                $lot = $videoData[7];
+                $movieAlbum = $videoData[8];
+                $views = $videoData[9];
+                $revenue = $videoData[10];
+                $rpm = $videoData[11];
 
                 $singleChannel = [
                     "yt_id" => $channelYtId,
@@ -183,27 +179,12 @@ class Videos extends Controller
                     "asset_id" => $assetId,
                     "type" => $type,
                     "lot" => $lot,
-                    "movie_album"=> $movieAlbum
+                    "movie_album"=> $movieAlbum,
+                    "custom_id" => $customId
                 ];
 
                 $existsInTempVideoInsertArray = in_array($videoYtId,$insertedVideos);
                 $existsInVideoTable = in_array($videoYtId,$videoIdsIndb);
-
-                // echo "Video YT ID : ".$videoYtId."<br>";
-                // //dd(["in_db"=>$videoIdsIndb,"inserted"=>$insertedVideos]);
-                
-
-                // if(!$existsInTempVideoInsertArray&&!$existsInVideoTable){
-                
-                //     echo "insert hoga ";
-
-                // }else{
-
-                //     echo "insert nae hoga";
-
-                // }
-
-                // exit;
 
                 if(!$existsInTempVideoInsertArray&&!$existsInVideoTable){
 
@@ -211,17 +192,15 @@ class Videos extends Controller
                     $insertedVideos[] = $videoYtId;
 
                 }
-
                 
-
                 
-
                 $singleVideoData = [
                     "video_yt_id" => $videoYtId,
                     "month" => $month,
                     "year" => $year,
                     "views"=> $views,
-                    "revenue" => $revenue
+                    "revenue" => $revenue,
+                    "rpm" => $rpm
                 ];
 
                 $existsInTempVideoDataInsertArray = in_array($videoYtId,$insertedVideoData);
@@ -245,6 +224,10 @@ class Videos extends Controller
             DataModel::insert($chunkVideoData);
 
         }
+
+
+
+        $this->import_data("Data imported successfully");
 
 
     }
