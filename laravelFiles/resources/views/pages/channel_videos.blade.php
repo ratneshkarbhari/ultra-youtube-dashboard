@@ -10,7 +10,7 @@
                     <th>YouTube Id</th>					
                     <th>Video Title</th>					
                     <th>Asset Id</th>
-                    <th>Custom Id</th>
+                    <th>Custom ID</th>
                     <th>Type</th>
                     <th>Lot</th>
                     <th>Movie / Album</th>
@@ -27,8 +27,7 @@
                     <td><a href="{{url('video-data/'.$video->yt_id)}}">{{$video->yt_id}}</a></td>					
                     <td>{{$video->title}}</td>
                     <td>{{$video->asset_id}}</td>
-                    <td></td>
-                    {{-- <td>{{$video->channel_system_id}}</td> --}}
+                    <td>{{$video->custom_id}}</td>
                     <td>{{$video->type}}</td>
                     <td>{{$video->lot}}</td>
                     <td>{{$video->movie_album}}</td>

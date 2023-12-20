@@ -88,8 +88,8 @@
                     <td>{{$video_stat->month}} - {{$video_stat->year}}</td>					
                     {{-- <td>{{$video_stat->year}}</td>					 --}}
                     <td>{{$video_stat->views}}</td>					
-                    <td>{{$video_stat->revenue}}</td>					
-                    <td>1234</td>					
+                    <td>{{$video_stat->revenue}}</td>				
+                    <td>{{$video_stat->rpm}}</td>						
                 </tr>
                 @endforeach
             </tbody>
